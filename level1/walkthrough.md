@@ -42,15 +42,15 @@ Non-debugging symbols:
 ...SNIP...
 ```
 
-## Calculating the Offset
+## Calculating the Instruction Pointer Offset
 
 [Pwndbg](https://github.com/pwndbg/pwndbg) is a Python module that adds useful utilities and enhancements to GDB and
 LLDB, making these debuggers easier to use. 
 Inside we find `Pwn cyclic` which is a tool used to identify the exact location of a buffer overflow.
 
 It works by generating a sequence of unique patterns, which can be inputted into a program. Once the buffer overflow is
-achieved, the crash dump will contain part of this unique pattern. By analyzing the crash dump, we can pinpoint the exact
-offset where the buffer overflow occurred.
+achieved, the crash dump will contain part of this unique pattern. By analyzing the crash dump, we can pinpoint the
+exact offset where the buffer overflow occurred.
 
 
 ```shell
@@ -81,9 +81,9 @@ LEGEND: STACK | HEAP | CODE | DATA | WX | RODATA
 ...SNIP...
 ```
 
-The register we are interested in is the EIP register, which contains the address of the next instruction to be
-executed. We see that the EIP register contains the value 'taaa'. Using the cyclic -l command, we can find the offset in
-the cyclic pattern that corresponds to this value. In this case, the offset is 76 bytes.
+The register we are interested in is the EIP (Extended Instruction Pointer) register, which contains the address of the
+next instruction to be executed. We see that the EIP register contains the value 'taaa'. Using the cyclic -l command, we
+can find the offset in the cyclic pattern that corresponds to this value. In this case, the offset is 76 bytes.
 
 ```shell
 pwndbg> cyclic -l taaa
