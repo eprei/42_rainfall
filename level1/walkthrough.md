@@ -52,7 +52,6 @@ It works by generating a sequence of unique patterns, which can be inputted into
 achieved, the crash dump will contain part of this unique pattern. By analyzing the crash dump, we can pinpoint the
 exact offset where the buffer overflow occurred.
 
-
 ```shell
 ┌──(kali㉿kali)-[~/rainfall/level1]
 └─$ gdb ./level1       
