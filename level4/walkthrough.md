@@ -30,7 +30,8 @@ in the low-order bytes.
 We want to write these values at address 0x08049810: 0x5544 (the lower two bytes) at 0x08049810, and 0x0102 (the higher
 two bytes) at 0x08049812 (which is 0x08049810 + 2).
 
-Converted to little-endian, the two addresses become `\x10\x98\x04\x08\x12\x98\x04\x08`.
+Converted to little-endian, the two addresses become `\x10\x98\x04\x08` or the lower two bytes and `\x12\x98\x04\x08`
+for the higher two bytes. Or concatenated in `\x10\x98\x04\x08\x12\x98\x04\x08`.
 
 ## Determining the Position of our argument on the Stack
 
@@ -59,9 +60,9 @@ The resulting exploit is: `\x10\x98\x04\x08\x12\x98\x04\x08%250x%13$hn%21570x%12
 - \x10\x98\x04\x08 or 0x08049810 (in reverse order) points to the high order bytes.
 - \x12\x98\x04\x08 or 0x08049812 (in reverse order) points to the low order bytes.
 - %250x will write 250 bytes on the standard output.
-- %13$hn will write 8 + 250 = 258 bytes (or 0x0102) at the first address specified (0x08049810).
-- %21570x will write 21570 bytes on the standard output.
-- %12$hn will write 8 + 250 + 21570 = 21828 (or 0x5544) at the second address specified (0x08049812).
+- %13$hn will write 8 + 250 = 258 bytes (or 0x0102) at the second address specified (0x08049812).
+- %21570x will write 21570 bytes on the standard output.0x08049810
+- %12$hn will write 8 + 250 + 21570 = 21828 (or 0x5544) at the first address specified (0x08049810).
 
 We use Python to generate the exploit and save it to a file:
 ```shell
