@@ -1,0 +1,31 @@
+void m(void *param_1,int param_2,char *param_3,int param_4,int param_5)
+{
+  time_t time_1;
+
+  time_1 = time((time_t *)0x0);
+  printf("%s - %d\n",c,time_1);
+  return;
+}
+
+int main(int argc,char *argv)
+{
+  undefined4 *buffer_heap_1;
+  void *tmp_pointer;
+  undefined4 *buffer_heap_2;
+  FILE *password_file;
+
+  buffer_heap_1 = (undefined4 *)malloc(8);
+  *buffer_heap_1 = 1;
+  tmp_pointer = malloc(8);
+  buffer_heap_1[1] = tmp_pointer;
+  buffer_heap_2 = (undefined4 *)malloc(8);
+  *buffer_heap_2 = 2;
+  tmp_pointer = malloc(8);
+  buffer_heap_2[1] = tmp_pointer;
+  strcpy((char *)buffer_heap_1[1],*(char **)(argv + 4));
+  strcpy((char *)buffer_heap_2[1],*(char **)(argv + 8));
+  password_file = fopen("/home/user/level8/.pass","r");
+  fgets(c,68,password_file);
+  puts("~~");
+  return 0;
+}
