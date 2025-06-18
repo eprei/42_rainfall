@@ -1,0 +1,42 @@
+void __thiscall N::N(N *this,int param_1)
+{
+  *(undefined ***)this = &PTR_operator+_08048848;
+  *(int *)(this + 0x68) = param_1;
+  return;
+}
+
+void __thiscall N::setAnnotation(N *this,char *argv_1)
+{
+  size_t argv_len;
+
+  argv_len = strlen(argv_1);
+  memcpy(this + 4,argv_1,argv_len);
+  return;
+}
+
+int __thiscall N::operator+(N *this,N *other)
+{
+  return *(int *)(other + 0x68) + *(int *)(this + 0x68);
+}
+
+int __thiscall N::operator-(N *this,N *other)
+{
+  return *(int *)(this + 0x68) - *(int *)(other + 0x68);
+}
+
+void main(int argc,char **argv)
+{
+  N *second_instance;
+  N *instance;
+
+  if (argc < 2) {
+    _exit(1);
+  }
+  second_instance = (N *)operator.new(0x6c);
+  N::N(second_instance,0x5);
+  instance = (N *)operator.new(0x6c);
+  N::N(instance,0x6);
+  N::setAnnotation(second_instance,argv[1]);
+  (*(code *)**(undefined4 **)instance)(instance,second_instance);
+  return;
+}
