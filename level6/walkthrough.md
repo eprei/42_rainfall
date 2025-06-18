@@ -10,7 +10,7 @@ allocated sequentially, we can assume they are adjacent in memory. Therefore, if
 overwrite the `function_pointer` to point to the `n` function. When the program calls the function pointer, it will
 execute the `n` function instead of the `m` function.
 
-## The address of the `o` function
+## The address of the `n` function
 
 ```shell
 ┌──(kali㉿kali)-[~/rainfall/level6]
