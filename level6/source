@@ -1,25 +1,29 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 void n(void)
 {
   system("/bin/cat /home/user/level7/.pass");
   return;
 }
 
-void m(void *param_1,int param_2,char *param_3,int param_4,int param_5)
+void m()
 {
   puts("Nope");
   return;
 }
 
+void main(int argc,char **argv)
 
-void main(undefined4 param_1,int param_2)
 {
   char *buffer;
-  undefined4 *function_pointer;
+  void (*function_pointer)(void);
 
   buffer = (char *)malloc(64);
-  function_pointer = (undefined4 *)malloc(4);
-  *function_pointer = m;
-  strcpy(buffer,*(char **)(param_2 + 4));
-  (*(code *)*function_pointer)();
+  function_pointer = malloc(4);
+  function_pointer = &m;
+  strcpy(buffer,argv[1]);
+  function_pointer();
   return;
 }
