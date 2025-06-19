@@ -1,31 +1,42 @@
-void m(void *param_1,int param_2,char *param_3,int param_4,int param_5)
-{
-  time_t time_1;
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
 
-  time_1 = time((time_t *)0x0);
-  printf("%s - %d\n",c,time_1);
+char c[68];
+
+void m()
+{
+  time_t t;
+
+  t = time((time_t *)0);
+  printf("%s - %d\n",c,t);
   return;
 }
 
-int main(int argc,char *argv)
+int main(int argc,char **argv)
 {
-  undefined4 *buffer_heap_1;
-  void *tmp_pointer;
-  undefined4 *buffer_heap_2;
+  char **heap_1;
+  char *tmp_pointer;
+  char **heap_2;
   FILE *password_file;
 
-  buffer_heap_1 = (undefined4 *)malloc(8);
-  *buffer_heap_1 = 1;
+  heap_1 = (char **)malloc(8);
+  heap_1[0] = (char *)1;
   tmp_pointer = malloc(8);
-  buffer_heap_1[1] = tmp_pointer;
-  buffer_heap_2 = (undefined4 *)malloc(8);
-  *buffer_heap_2 = 2;
+  heap_1[1] = tmp_pointer;
+
+  heap_2 = (char **)malloc(8);
+  heap_2[0] = (char *)2;
   tmp_pointer = malloc(8);
-  buffer_heap_2[1] = tmp_pointer;
-  strcpy((char *)buffer_heap_1[1],*(char **)(argv + 4));
-  strcpy((char *)buffer_heap_2[1],*(char **)(argv + 8));
+  heap_2[1] = tmp_pointer;
+
+  strcpy(heap_1[1],argv[1]);
+  strcpy(heap_2[1],argv[2]);
+
   password_file = fopen("/home/user/level8/.pass","r");
   fgets(c,68,password_file);
   puts("~~");
+
   return 0;
 }
