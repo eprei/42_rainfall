@@ -1,22 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 void p(void)
 {
-  uint unaff_retaddr;
+  unsigned int return_address;
   char buffer [76];
 
   fflush(stdout);
   gets(buffer);
-  if ((unaff_retaddr & 0xb0000000) == 0xb0000000) {
-    printf("(%p)\n",unaff_retaddr);
-                    /* WARNING: Subroutine does not return */
-    _exit(1);
+  if ((return_address & 0xb0000000) == 0xb0000000) {
+    printf("(%p)\n", return_address);
+                        /* WARNING: Subroutine does not return */
+    exit(1);
   }
   puts(buffer);
   strdup(buffer);
   return;
 }
 
-void main(void)
+int main(void)
 {
   p();
-  return;
+  return 0;
 }
