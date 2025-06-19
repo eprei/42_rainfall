@@ -1,126 +1,41 @@
-undefined4 main(void)
-{
-  char *auth_plus_1;
-  int command_length;
-  uint counter;
-  bool bool0;
-  bool bool2;
-  bool bool3;
-  bool bool4;
-  bool bool1;
-  bool bool5;
-  bool condition;
-  bool bool6;
-  byte zero;
-  byte buffer [5];
-  char overflow_target [2];
-  char acStack_89 [125];
-  byte *char_ptr_1;
-  char *command_1;
-  char *auth_plus_2;
-  char *auth_plus_3;
-  char character;
-  byte *chat_ptr_2;
-  byte *command_2;
-  
-  zero = 0;
-  do {
-    printf("%p, %p \n",auth,service);
-    auth_plus_1 = fgets((char *)buffer,128,stdin);
-    bool0 = false;
-    bool1 = auth_plus_1 == (char *)0;
-    if (bool1) {
-      return 0;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *auth = NULL;
+char *service = NULL;
+
+int main(void) {
+    char buffer[8];
+
+    while (1) {
+        printf("%p, %p \n", auth, service);
+
+        if (!fgets(buffer, sizeof(buffer), stdin))
+            break;
+
+        else if (strncmp(buffer, "auth ", 5) == 0) {
+            auth = malloc(4);
+            bzero(auth, 4);
+            if (strlen(buffer + 5) < 31) {
+                strcpy(auth, buffer + 5);
+            }
+        }
+
+        else if (strncmp(buffer, "reset", 5) == 0) {
+            free(auth);
+        }
+
+        else if (strncmp(buffer, "service", 7) == 0) {
+            service = strdup(buffer + 8);
+        }
+
+        else if (strncmp(buffer, "login", 5) == 0) {
+            if (*(int*)(auth + 32) == 0) {
+                puts("Password:");
+            } else {
+                system("/bin/sh");
+            }
+        }
     }
-    command_length = 5;
-    char_ptr_1 = buffer;
-    command_1 = (byte *)"auth ";
-    do {
-      if (command_length == 0) break;
-      command_length = command_length + -1;
-      bool0 = *char_ptr_1 < *command_1;
-      bool1 = *char_ptr_1 == *command_1;
-      char_ptr_1 = char_ptr_1 + (uint)zero * -2 + 1;
-      command_1 = command_1 + (uint)zero * -2 + 1;
-    } while (bool1);
-    bool2 = false;
-    bool5 = (!bool0 && !bool1) == bool0;
-    if (bool5) {
-      auth = (char *)malloc(4);
-      auth_plus_1 = auth + 1;
-      auth_plus_2 = auth + 2;
-      auth_plus_3 = auth + 3;
-      auth[0] = '\0';
-      *auth_plus_1 = '\0';
-      *auth_plus_2 = '\0';
-      *auth_plus_3 = '\0';
-      counter = 4294967295;
-      auth_plus_1 = overflow_target;
-      do {
-        if (counter == 0) break;
-        counter = counter - 1;
-        character = *auth_plus_1;
-        auth_plus_1 = auth_plus_1 + (uint)zero * -2 + 1;
-      } while (character != '\0');
-      counter = ~counter - 1;
-      bool2 = counter < 30;
-      bool5 = counter == 30;
-      if (counter < 31) {
-        strcpy(auth,overflow_target);
-      }
-    }
-    command_length = 5;
-    chat_ptr_2 = buffer;
-    command_2 = (byte *)"reset";
-    do {
-      if (command_length == 0) break;
-      command_length = command_length + -1;
-      bool2 = *chat_ptr_2 < *command_2;
-      bool5 = *chat_ptr_2 == *command_2;
-      chat_ptr_2 = chat_ptr_2 + (uint)zero * -2 + 1;
-      command_2 = command_2 + (uint)zero * -2 + 1;
-    } while (bool5);
-    bool3 = false;
-    condition = (!bool2 && !bool5) == bool2;
-    if (condition) {
-      free(auth);
-    }
-    command_length = 6;
-    chat_ptr_2 = buffer;
-    command_2 = (byte *)"service";
-    do {
-      if (command_length == 0) break;
-      command_length = command_length + -1;
-      bool3 = *chat_ptr_2 < *command_2;
-      condition = *chat_ptr_2 == *command_2;
-      chat_ptr_2 = chat_ptr_2 + (uint)zero * -2 + 1;
-      command_2 = command_2 + (uint)zero * -2 + 1;
-    } while (condition);
-    bool4 = false;
-    bool6 = (!bool3 && !condition) == bool3;
-    if (bool6) {
-      bool4 = (byte *)0xfffffff8 < buffer;
-      bool6 = acStack_89 == (char *)0x0;
-      service = strdup(acStack_89);
-    }
-    command_length = 5;
-    chat_ptr_2 = buffer;
-    command_2 = (byte *)"login";
-    do {
-      if (command_length == 0) break;
-      command_length = command_length + -1;
-      bool4 = *chat_ptr_2 < *command_2;
-      bool6 = *chat_ptr_2 == *command_2;
-      chat_ptr_2 = chat_ptr_2 + (uint)zero * -2 + 1;
-      command_2 = command_2 + (uint)zero * -2 + 1;
-    } while (bool6);
-    if ((!bool4 && !bool6) == bool4) {
-      if (*(int *)(auth + 32) == 0) {
-        fwrite("Password:\n",1,10,stdout);
-      }
-      else {
-        system("/bin/sh");
-      }
-    }
-  } while( true );
 }
