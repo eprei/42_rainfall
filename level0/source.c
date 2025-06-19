@@ -1,16 +1,20 @@
-int main(undefined4 param_1,int param_2)
+#define _GNU_SOURCE
+#include <stdlib.h> source.c
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+
+int main(int argc,char **argv)
 
 {
   int user_input;
   char *command;
-  undefined4 local_1c;
-  __uid_t uid;
-  __gid_t gid;
-  
-  user_input = atoi(*(char **)(param_2 + 4));
-  if (user_input == 0x1a7) {
+  uid_t uid;
+  gid_t gid;
+
+  user_input = atoi(argv[1]);
+  if (user_input == 423) {
     command = strdup("/bin/sh");
-    local_1c = 0;
     gid = getegid();
     uid = geteuid();
     setresgid(gid,gid,gid);
