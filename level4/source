@@ -1,6 +1,11 @@
-void p(char *param_1)
+#include <stdio.h>
+#include <stdlib.h>
+
+int m;
+
+void p(char *str)
 {
-  printf(param_1);
+  printf(str);
   return;
 }
 
