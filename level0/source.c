@@ -22,7 +22,7 @@ int main(int argc,char **argv)
     execv("/bin/sh",&command);
   }
   else {
-    fwrite("No !\n",1,5,(FILE *)stderr);
+    fwrite("No !\n",1,5,stderr);
   }
   return 0;
 }
